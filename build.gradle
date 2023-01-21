@@ -8,6 +8,10 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.spring' version '1.6.21'
 }
 
+configurations {
+    asciidoctorExt
+}
+
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
@@ -23,13 +27,17 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("org.junit.jupiter:junit-jupiter:5.8.1")
+    implementation('org.junit.jupiter:junit-jupiter:5.9.2')
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
 
-    testImplementation("org.springframework.restdocs:spring-restdocs-asciidoctor:2.0.7.RELEASE")
+    asciidoctorExt("org.springframework.restdocs:spring-restdocs-asciidoctor:2.0.7.RELEASE")
     testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc:2.0.7.RELEASE")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+}
+
+ext {
+    snippetsDir = file('build/generated-snippets')
 }
 
 tasks.withType(KotlinCompile) {
@@ -39,6 +47,25 @@ tasks.withType(KotlinCompile) {
     }
 }
 
-tasks.named('test') {
+test {
     useJUnitPlatform()
+    outputs.dir snippetsDir
+}
+
+jar {
+    enabled = false
+}
+
+bootJar {
+    dependsOn asciidoctor
+    copy {
+        from "${asciidoctor.outputDir}"
+        into "src/main/resources/static/docs"
+    }
+}
+
+asciidoctor {
+    dependsOn test
+    inputs.dir snippetsDir
+    configurations 'asciidoctorExt'
 }
