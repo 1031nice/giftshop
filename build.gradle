@@ -1,0 +1,71 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+plugins {
+    id 'org.springframework.boot' version '2.7.7'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'org.jetbrains.kotlin.jvm' version '1.6.21'
+    id 'org.asciidoctor.jvm.convert' version '3.3.2'
+    id 'org.jetbrains.kotlin.plugin.spring' version '1.6.21'
+}
+
+configurations {
+    asciidoctorExt
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("com.h2database:h2")
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    implementation('org.junit.jupiter:junit-jupiter:5.9.2')
+    compileOnly("org.projectlombok:lombok")
+    annotationProcessor("org.projectlombok:lombok")
+
+    asciidoctorExt("org.springframework.restdocs:spring-restdocs-asciidoctor:2.0.7.RELEASE")
+    testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc:2.0.7.RELEASE")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+}
+
+ext {
+    snippetsDir = file('build/generated-snippets')
+}
+
+tasks.withType(KotlinCompile) {
+    kotlinOptions {
+        freeCompilerArgs = ['-Xjsr305=strict']
+        jvmTarget = '11'
+    }
+}
+
+test {
+    useJUnitPlatform()
+    outputs.dir snippetsDir
+}
+
+jar {
+    enabled = false
+}
+
+bootJar {
+    dependsOn asciidoctor
+    copy {
+        from "${asciidoctor.outputDir}"
+        into "src/main/resources/static/docs"
+    }
+}
+
+asciidoctor {
+    dependsOn test
+    inputs.dir snippetsDir
+    configurations 'asciidoctorExt'
+}

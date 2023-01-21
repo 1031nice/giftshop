@@ -1,0 +1,44 @@
+= GiftShop HTTP API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+
+= 상품
+== 상품 조회
+=== curl
+
+include::{snippets}/products/getProduct/curl-request.adoc[]
+
+=== request
+
+include::{snippets}/products/getProduct/http-request.adoc[]
+
+=== path variable
+
+include::{snippets}/products/getProduct/path-parameters.adoc[]
+
+=== response
+
+include::{snippets}/products/getProduct/http-response.adoc[]
+
+== 상품 추가
+
+=== curl
+
+include::{snippets}/products/createProduct/curl-request.adoc[]
+
+=== request
+
+include::{snippets}/products/createProduct/http-request.adoc[]
+
+=== response
+
+include::{snippets}/products/createProduct/http-response.adoc[]
+
+=== response fields
+
+include::{snippets}/products/createProduct/response-fields.adoc[]
+
